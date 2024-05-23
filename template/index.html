@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../asset/style.css">
+    <title>chatRoom</title>
+</head>
+<body>
+    <div class="room">
+        <div class="containeChat"></div>
+        <input type="text" class="text">
+        <button class="send">SendMsg</button>
+    </div>
+
+    <script >
+        (function(){
+    const send = document.querySelector(".send")
+    const message = document.querySelector(".containeChat")
+    const box = document.querySelector(".text")
+    
+    let ws
+    const showMsg=(messag)=>{
+        message.textContent+=`\n\n${messag}`
+        message.scrollTop=message.scrollHeight
+        box.value=""
+    }
+    const initWs=()=>{
+        if (ws){
+            ws.onerror=ws.onopen=ws.onclose=null
+            ws.close()
+        }
+        ws = new WebSocket(`ws://localhost:8000`)
+        ws.onopen=()=>{
+            console.log("connection establish...")
+        }
+
+        ws.addEventListener('message', (event) => {
+            console.log(event)
+        })
+        ws.onclose=()=>{
+            ws=null
+            console.log("close ws...");
+        }
+    }
+    send.onclick=()=>{
+        if (!ws){
+            showMsg("NO ws ...")
+            return
+        }
+        ws.send(JSON.stringify(
+            {
+                type: "I am clicking",
+                content: box.value
+            }
+        ))
+    }
+    initWs()
+})()
+    </script>
+</body>
+</html>
